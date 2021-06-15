@@ -22,7 +22,7 @@ import (
 type MetricsVault struct {
 	now func() time.Time
 
-	metrics []ConstMetricCollector
+	metrics map[string]ConstMetricCollector
 }
 
 type Mapping struct {
@@ -41,13 +41,13 @@ type Sample struct {
 }
 
 func NewVault() *MetricsVault {
-	return &MetricsVault{now: time.Now}
+	return &MetricsVault{now: time.Now, metrics: make(map[string]ConstMetricCollector)}
 }
 
 func (v *MetricsVault) RegisterMappings(mappings []Mapping) error {
 	for _, mapping := range mappings {
 		collector := NewConstGaugeCollector(mapping)
-		v.metrics = append(v.metrics, collector)
+		v.metrics[mapping.Name] = collector
 
 		if err := prometheus.Register(collector); err != nil {
 			return fmt.Errorf("mapping registration: %v", err)
@@ -56,7 +56,7 @@ func (v *MetricsVault) RegisterMappings(mappings []Mapping) error {
 	return nil
 }
 
-func (v *MetricsVault) Store(index int, sample Sample) error {
+func (v *MetricsVault) Store(index string, sample Sample) error {
 	binding := v.metrics[index]
 	binding.Store(v.now(), sample)
 	return nil

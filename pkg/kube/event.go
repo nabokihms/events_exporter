@@ -31,6 +31,8 @@ func EventToSample(event *v1.Event) vault.Sample {
 			/* involved_kind */ event.InvolvedObject.Kind,
 			/* involved_name */ event.InvolvedObject.Name,
 			/* involved_namespace */ event.InvolvedObject.Namespace,
+			/* reporting_controller */ event.ReportingController,
+			/* reporting_instance */ event.ReportingInstance,
 			/* reason */ event.Reason,
 			/* message */ event.Message,
 		},
@@ -40,7 +42,7 @@ func EventToSample(event *v1.Event) vault.Sample {
 func EventCallback(vault *vault.MetricsVault) func(obj interface{}) {
 	return func(obj interface{}) {
 		event := obj.(*v1.Event)
-		if err := vault.Store(0, EventToSample(event)); err != nil {
+		if err := vault.Store("kube_event_info", EventToSample(event)); err != nil {
 			log.Errorf("collecting event: %v", err)
 		}
 	}
@@ -57,6 +59,8 @@ func EventMapping() vault.Mapping {
 			"involved_kind",
 			"involved_name",
 			"involved_namespace",
+			"reporting_controller",
+			"reporting_instance",
 			"reason",
 			"message",
 		},
