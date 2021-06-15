@@ -34,6 +34,11 @@ func NewMetricsServer() *MetricsServer {
 func (m *MetricsServer) Start(address string, errorCh chan error) {
 	http.Handle("/metrics", promhttp.Handler())
 
+	http.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("ok"))
+	})
+
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		_, err := fmt.Fprintf(w, `<!DOCTYPE html>
 			<title>Events Exporter</title>

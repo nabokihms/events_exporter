@@ -45,6 +45,9 @@ func main() {
 		log.Fatalf("set log level: %v", err)
 	}
 
+	errorCh := make(chan error)
+	stopCh := make(chan struct{})
+
 	metricsVault := vault.NewVault()
 	err := metricsVault.RegisterMappings([]vault.Mapping{kube.EventMapping()})
 	if err != nil {
@@ -56,8 +59,9 @@ func main() {
 		log.Fatalf("kubernetes informer: %v", err)
 	}
 
-	errorCh := make(chan error)
-	stopCh := make(chan struct{})
+	// Be sure that after starting informer we clear all stale events before starting web server
+	informer.Run(stopCh, errorCh)
+	metricsVault.RemoveStaleMetrics()
 
 	metricsServer := server.NewMetricsServer()
 
@@ -66,7 +70,6 @@ func main() {
 
 	// TODO (nabokihms): check that every concurrent task stops correctly
 	go metricsServer.Start(exporterAddress, errorCh)
-	go informer.Run(stopCh, errorCh)
 
 	tick := time.NewTicker(time.Second)
 	for {

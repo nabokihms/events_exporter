@@ -36,11 +36,12 @@ func getClient(kubeconfigPath string) (kubernetes.Interface, error) {
 		log.Infof("using kubeconfig from file: %q", kubeconfigPath)
 	} else {
 		cfg, err = rest.InClusterConfig()
-		if !errors.Is(err, rest.ErrNotInCluster) {
+		switch {
+		case !errors.Is(err, rest.ErrNotInCluster):
 			return nil, fmt.Errorf("new kubernetes from cluster: %w", err)
-		} else if err == nil {
+		case err == nil:
 			log.Infof("using in-cluster kubeconfig")
-		} else {
+		default:
 			home, _ := os.UserHomeDir()
 			userKubeconfigPath := home + "/.kube/config"
 

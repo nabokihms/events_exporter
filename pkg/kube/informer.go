@@ -17,7 +17,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/prometheus/common/log"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -42,7 +41,6 @@ func NewEventsInformer(kubeconfigPath, fieldSelector string, handler func(object
 	}
 
 	informer := cache.NewSharedIndexInformer(
-		// TODO: allow filter events based on metav1.ListOptions
 		&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
 				opts := metav1.ListOptions{FieldSelector: fieldSelector}
@@ -79,9 +77,5 @@ func (e *EventsInformer) Run(stopCh <-chan struct{}, errorCh chan<- error) {
 
 	if ok := cache.WaitForCacheSync(stopCh, e.informer.HasSynced); !ok {
 		errorCh <- fmt.Errorf("informer cache is not synced")
-		return
 	}
-
-	<-stopCh
-	log.Info("stopping informer ...")
 }

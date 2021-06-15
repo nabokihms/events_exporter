@@ -36,6 +36,7 @@ func EventToSample(event *v1.Event) vault.Sample {
 			/* reason */ event.Reason,
 			/* message */ event.Message,
 		},
+		Timestamp: event.LastTimestamp.Local(),
 	}
 }
 

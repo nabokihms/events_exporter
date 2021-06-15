@@ -86,8 +86,12 @@ func (c *GaugeCollector) Store(timestamp time.Time, sample Sample) {
 	}
 
 	storedMetric.Value = gaugeValue
-	// TODO(nabokihms): use event timestamp here instead
+
 	storedMetric.LastUpdate = timestamp
+	if !sample.Timestamp.IsZero() {
+		storedMetric.LastUpdate = sample.Timestamp
+	}
+
 	c.collection[labelsHash] = storedMetric
 }
 
