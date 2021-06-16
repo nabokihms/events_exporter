@@ -65,5 +65,6 @@ func (m *MetricsServer) Close() {
 	log.Info("closing metrics server ...")
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
+
 	_ = m.srv.Shutdown(ctx)
 }

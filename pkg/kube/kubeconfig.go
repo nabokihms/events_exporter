@@ -16,6 +16,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/prometheus/common/log"
 	"k8s.io/client-go/kubernetes"
@@ -43,7 +44,7 @@ func getClient(kubeconfigPath string) (kubernetes.Interface, error) {
 			log.Infof("using in-cluster kubeconfig")
 		default:
 			home, _ := os.UserHomeDir()
-			userKubeconfigPath := home + "/.kube/config"
+			userKubeconfigPath := filepath.Join(home, ".kube", "config")
 
 			cfg, err = clientcmd.BuildConfigFromFlags("", userKubeconfigPath)
 			if err != nil {
