@@ -66,6 +66,7 @@ func (c *GaugeCollector) Collect(ch chan<- prometheus.Metric) {
 	for _, s := range c.collection {
 		metric, err := prometheus.NewConstMetric(c.desc, prometheus.GaugeValue, s.Value, s.LabelValues...)
 		if err != nil {
+			// TODO(nabokihms): add counter for errors
 			log.Warnf("prepare gauge: %v", err)
 			continue
 		}

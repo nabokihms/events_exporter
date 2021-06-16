@@ -39,7 +39,10 @@ func NewEventsInformer(kubeconfigPath, fieldSelector string, handler func(object
 	if err != nil {
 		return nil, err
 	}
+	return newInformer(client, fieldSelector, handler)
+}
 
+func newInformer(client kubernetes.Interface, fieldSelector string, handler func(object interface{})) (*EventsInformer, error) {
 	informer := cache.NewSharedIndexInformer(
 		&cache.ListWatch{
 			ListFunc: func(options metav1.ListOptions) (runtime.Object, error) {
@@ -55,7 +58,6 @@ func NewEventsInformer(kubeconfigPath, fieldSelector string, handler func(object
 		defaultSyncPeriod,
 		cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc},
 	)
-
 	return &EventsInformer{client: client, informer: informer, eventHandler: handler}, nil
 }
 

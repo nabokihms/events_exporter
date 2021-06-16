@@ -21,6 +21,13 @@ import (
 	"github.com/nabokihms/events_exporter/pkg/vault"
 )
 
+func trimMessage(message string) string {
+	if len(message) <= 200 {
+		return message
+	}
+	return message[:200]
+}
+
 func EventToSample(event *v1.Event) vault.Sample {
 	return vault.Sample{
 		Value: float64(event.Count),
@@ -34,7 +41,7 @@ func EventToSample(event *v1.Event) vault.Sample {
 			/* reporting_controller */ event.ReportingController,
 			/* reporting_instance */ event.ReportingInstance,
 			/* reason */ event.Reason,
-			/* message */ event.Message,
+			/* message */ trimMessage(event.Message),
 		},
 		Timestamp: event.LastTimestamp.Local(),
 	}

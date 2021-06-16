@@ -16,8 +16,10 @@ COMMIT=$(shell git rev-parse --verify HEAD)
 # BUILDING
 ###########
 .PHONY: build
-build:
-	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build -o bin/events_exporter
+bin/events_exporter:
+	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build -mod=readonly -o bin/events_exporter
+
+build: bin/events_exporter
 
 ###########
 # LINTING
