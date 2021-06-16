@@ -41,3 +41,5 @@ fix: bin/golangci-lint
 ###########
 # TESTING
 ###########
+test:
+	go test -race -cover ./...

@@ -35,6 +35,7 @@ FROM alpine:3.13.5 AS main
 RUN apk add --no-cache --update ca-certificates
 COPY --from=builder /usr/local/src/events_exporter/bin/events_exporter /usr/local/bin/events_exporter
 
+# nobody
 USER 1001:1001
 
 ENTRYPOINT ["events_exporter"]
