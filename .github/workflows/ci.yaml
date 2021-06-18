@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  build:
+  test-and-lint:
     name: Test & Lint
     runs-on: ubuntu-latest
     env:
