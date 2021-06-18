@@ -9,8 +9,8 @@ on:
       - main
 
 jobs:
-  test-and-lint:
-    name: Test & Lint
+  build:
+    name: Build
     runs-on: ubuntu-latest
     env:
       GOFLAGS: -mod=readonly
@@ -29,3 +29,6 @@ jobs:
 
       - name: Lint
         run: make lint
+
+      - name: Build
+        run: make build
