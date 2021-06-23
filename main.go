@@ -59,18 +59,19 @@ func main() {
 		log.Fatalf("kubernetes informer: %v", err)
 	}
 
-	// Be sure that after starting informer we clear all stale events before starting web server
-	informer.Run(stopCh, errorCh)
-	metricsVault.RemoveStaleMetrics()
+	// TODO(nabokihms): Be sure that after starting informer we clear all stale events before starting web server
+	go func() {
+		informer.Run(stopCh, errorCh)
+		metricsVault.RemoveStaleMetrics()
+	}()
 
 	metricsServer := server.NewMetricsServer()
+	go metricsServer.Start(exporterAddress, errorCh)
 
 	signalChan := make(chan os.Signal, 1)
 	signal.Notify(signalChan, os.Interrupt, syscall.SIGTERM)
 
 	// TODO (nabokihms): check that every concurrent task stops correctly
-	go metricsServer.Start(exporterAddress, errorCh)
-
 	tick := time.NewTicker(time.Second)
 	for {
 		select {
