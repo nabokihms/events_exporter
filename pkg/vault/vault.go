@@ -34,6 +34,8 @@ type Mapping struct {
 }
 
 type Sample struct {
+	ID string
+
 	Labels []string
 	Value  float64
 

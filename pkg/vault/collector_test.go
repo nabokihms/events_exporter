@@ -21,10 +21,12 @@ func TestCollector(t *testing.T) {
 			Name: "Normal sample",
 			Samples: []Sample{
 				{
+					ID:        "metric-1",
 					Labels:    []string{"test-1"},
 					Timestamp: curTime,
 				},
 				{
+					ID:        "metric-2",
 					Labels:    []string{"test-2"},
 					Timestamp: curTime,
 				},
@@ -35,10 +37,12 @@ func TestCollector(t *testing.T) {
 			Name: "Normal sample and Expired sample",
 			Samples: []Sample{
 				{
+					ID:        "metric-1",
 					Labels:    []string{"test-ok"},
 					Timestamp: curTime,
 				},
 				{
+					ID:        "metric-2",
 					Labels:    []string{"test-expired"},
 					Timestamp: curTime.Add(-3 * time.Hour),
 				},

@@ -30,6 +30,7 @@ func trimMessage(message string) string {
 
 func EventToSample(event *v1.Event) vault.Sample {
 	return vault.Sample{
+		ID:    string(event.UID),
 		Value: float64(event.Count),
 		Labels: []string{
 			/* type */ event.Type,
