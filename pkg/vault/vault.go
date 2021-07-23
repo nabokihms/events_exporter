@@ -34,11 +34,14 @@ type Mapping struct {
 }
 
 type Sample struct {
+	// ID is a sample unique id e.g., labels hash, uuid.
 	ID string
-
+	// Labels are label values in determined order.
 	Labels []string
-	Value  float64
-
+	// Value is a sample latest sample value.
+	Value float64
+	// Timestamp is the time sample was collected.
+	// Events exporter will collect the expired sample basing on this field.
 	Timestamp time.Time
 }
 

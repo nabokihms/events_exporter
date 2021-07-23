@@ -20,8 +20,6 @@ import (
 	"github.com/prometheus/common/log"
 )
 
-const labelsSeparator = byte(255)
-
 type ConstMetricCollector interface {
 	Describe(chan<- *prometheus.Desc)
 	Collect(chan<- prometheus.Metric)

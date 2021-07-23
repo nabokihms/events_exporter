@@ -27,6 +27,7 @@ import (
 
 const defaultSyncPeriod = 10 * time.Minute
 
+// EventsInformer handles Kubernetes events. The is the shim between metrics storage and Kubernetes cluster.
 type EventsInformer struct {
 	client   kubernetes.Interface
 	informer cache.SharedIndexInformer
@@ -34,6 +35,7 @@ type EventsInformer struct {
 	eventHandler func(object interface{})
 }
 
+// NewEventsInformer creates cached informer to track events from a Kubernetes cluster.
 func NewEventsInformer(kubeconfigPath, fieldSelector string, handler func(object interface{})) (*EventsInformer, error) {
 	client, err := getClient(kubeconfigPath)
 	if err != nil {
@@ -61,6 +63,7 @@ func newInformer(client kubernetes.Interface, fieldSelector string, handler func
 	return &EventsInformer{client: client, informer: informer, eventHandler: handler}, nil
 }
 
+// Run starts the informer with various handlers and waits for the first cache synchronization.
 func (e *EventsInformer) Run(stopCh <-chan struct{}, errorCh chan<- error) {
 	e.informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
 		AddFunc: e.eventHandler,

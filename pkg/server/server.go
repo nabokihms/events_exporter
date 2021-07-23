@@ -23,14 +23,17 @@ import (
 	"github.com/prometheus/common/log"
 )
 
+// MetricsServer is an http server which serves prometheus metrics from the metrics vault.
 type MetricsServer struct {
 	srv *http.Server
 }
 
+// NewMetricsServer returns a metrics server instance.
 func NewMetricsServer() *MetricsServer {
 	return &MetricsServer{srv: &http.Server{}}
 }
 
+// Start runs metrics server with typical exporter handlers.
 func (m *MetricsServer) Start(address string, errorCh chan error) {
 	http.Handle("/metrics", promhttp.Handler())
 
