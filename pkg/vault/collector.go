@@ -13,12 +13,16 @@
 package vault
 
 import (
+	"bytes"
+	"hash/fnv"
 	"sync"
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/common/log"
 )
+
+const labelsSeparator = byte(255)
 
 type ConstMetricCollector interface {
 	Describe(chan<- *prometheus.Desc)
@@ -41,14 +45,14 @@ type StampedGaugeMetric struct {
 type GaugeCollector struct {
 	mu sync.RWMutex
 
-	collection map[string]StampedGaugeMetric
+	collection map[uint64]StampedGaugeMetric
 	desc       *prometheus.Desc
 	mapping    Mapping
 }
 
 func NewConstGaugeCollector(mapping Mapping) *GaugeCollector {
 	desc := prometheus.NewDesc(mapping.Name, mapping.Help, mapping.LabelNames, nil)
-	return &GaugeCollector{mapping: mapping, collection: make(map[string]StampedGaugeMetric), desc: desc}
+	return &GaugeCollector{mapping: mapping, collection: make(map[uint64]StampedGaugeMetric), desc: desc}
 }
 
 func (c *GaugeCollector) Describe(ch chan<- *prometheus.Desc) {
@@ -71,11 +75,13 @@ func (c *GaugeCollector) Collect(ch chan<- prometheus.Metric) {
 }
 
 func (c *GaugeCollector) Store(timestamp time.Time, sample Sample) {
+	labelsHash := hashLabels(sample.Labels)
+
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
 	gaugeValue := sample.Value
-	storedMetric, ok := c.collection[sample.ID]
+	storedMetric, ok := c.collection[labelsHash]
 	if !ok {
 		storedMetric = StampedGaugeMetric{Value: gaugeValue, LabelValues: sample.Labels}
 	}
@@ -87,7 +93,7 @@ func (c *GaugeCollector) Store(timestamp time.Time, sample Sample) {
 		storedMetric.LastUpdate = sample.Timestamp
 	}
 
-	c.collection[sample.ID] = storedMetric
+	c.collection[labelsHash] = storedMetric
 }
 
 func (c *GaugeCollector) Clear(now time.Time) {
@@ -99,4 +105,19 @@ func (c *GaugeCollector) Clear(now time.Time) {
 			delete(c.collection, labelsHash)
 		}
 	}
+}
+
+func hashLabels(labels []string) uint64 {
+	// TODO(nabokihms): declare hasher once
+	// TODO(nabokihms): consider better hashing
+	hasher := fnv.New64a()
+	var hashbuf bytes.Buffer
+
+	for _, labelValue := range labels {
+		hashbuf.WriteString(labelValue)
+		hashbuf.WriteByte(labelsSeparator)
+	}
+
+	_, _ = hasher.Write(hashbuf.Bytes())
+	return hasher.Sum64()
 }
