@@ -1,6 +1,7 @@
 package vault
 
 import (
+	"sort"
 	"testing"
 	"time"
 
@@ -91,6 +92,7 @@ func TestCollector(t *testing.T) {
 				names = append(names, *convertedMetric.Label[0].Value)
 			}
 
+			sort.Strings(names)
 			require.Equal(t, tc.Result, names)
 		})
 	}
