@@ -28,16 +28,18 @@ import (
 
 func main() {
 	var (
-		exporterAddress = ":9000"
-		logLevel        = "info"
-		kubeconfig      = ""
-		fieldSelector   = ""
+		exporterAddress    = ":9000"
+		logLevel           = "info"
+		kubeconfig         = ""
+		fieldSelector      = ""
+		omitEventsMessages = false
 	)
 
 	flag.StringVar(&exporterAddress, "server.exporter-address", exporterAddress, "Address to export prometheus metrics")
 	flag.StringVar(&logLevel, "server.log-level", logLevel, "Log level")
 	flag.StringVar(&kubeconfig, "kube.config", kubeconfig, "Path to kubeconfig (optional)")
 	flag.StringVar(&fieldSelector, "kube.field-selector", fieldSelector, "Events filter as for kubectl")
+	flag.BoolVar(&omitEventsMessages, "kube.omit-events-messages", omitEventsMessages, "Do not expose message field from events (it reduces cardinality)")
 
 	flag.Parse()
 
@@ -54,7 +56,7 @@ func main() {
 		log.Fatalf("mappings registration: %v", err)
 	}
 
-	informer, err := kube.NewEventsInformer(kubeconfig, fieldSelector, kube.EventCallback(metricsVault))
+	informer, err := kube.NewEventsInformer(kubeconfig, fieldSelector, kube.EventCallback(metricsVault, omitEventsMessages))
 	if err != nil {
 		log.Fatalf("kubernetes informer: %v", err)
 	}

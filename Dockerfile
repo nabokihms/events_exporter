@@ -10,7 +10,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-FROM golang:1.16.5-alpine3.13 AS builder
+FROM golang:1.17.6-alpine3.15 AS builder
 
 RUN apk add --no-cache --update alpine-sdk bash
 
@@ -30,7 +30,7 @@ COPY . .
 RUN make build
 
 
-FROM alpine:3.13.5 AS main
+FROM alpine:3.15.0 AS main
 
 RUN apk add --no-cache --update ca-certificates
 COPY --from=builder /usr/local/src/events_exporter/bin/events_exporter /usr/local/bin/events_exporter

@@ -10,6 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package server
 
 import (
@@ -23,7 +24,7 @@ import (
 	"github.com/prometheus/common/log"
 )
 
-// MetricsServer is an http server which serves prometheus metrics from the metrics vault.
+// MetricsServer is a http server which serves prometheus metrics from the metrics vault.
 type MetricsServer struct {
 	srv *http.Server
 }

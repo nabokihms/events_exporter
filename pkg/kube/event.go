@@ -10,6 +10,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package kube
 
 import (
@@ -31,7 +32,12 @@ func trimMessage(message string) string {
 }
 
 // EventToSample converts Kubernetes core v1.Event to the prometheus metric sample.
-func EventToSample(event *v1.Event) vault.Sample {
+func EventToSample(event *v1.Event, omitEventsMessages bool) vault.Sample {
+	var message string
+	if !omitEventsMessages {
+		message = trimMessage(event.Message)
+	}
+
 	return vault.Sample{
 		ID:    string(event.UID),
 		Value: float64(event.Count),
@@ -45,17 +51,17 @@ func EventToSample(event *v1.Event) vault.Sample {
 			/* reporting_controller */ event.ReportingController,
 			/* reporting_instance */ event.ReportingInstance,
 			/* reason */ event.Reason,
-			/* message */ trimMessage(event.Message),
+			/* message */ message,
 		},
 		Timestamp: event.LastTimestamp.Local(),
 	}
 }
 
 // EventCallback generates the handler to connect prometheus metrics vault to the shared events informer.
-func EventCallback(vault *vault.MetricsVault) func(obj interface{}) {
+func EventCallback(vault *vault.MetricsVault, omitEventsMessages bool) func(obj interface{}) {
 	return func(obj interface{}) {
 		event := obj.(*v1.Event)
-		if err := vault.Store("kube_event_info", EventToSample(event)); err != nil {
+		if err := vault.Store("kube_event_info", EventToSample(event, omitEventsMessages)); err != nil {
 			log.Errorf("collecting event: %v", err)
 		}
 	}
