@@ -21,19 +21,29 @@ Usage of events_exporter:
 
 ## Install
 
+### Docker Container
+
 Ready-to-use Docker images are [available on GitHub](https://github.com/nabokihms/events_exporter/pkgs/container/events_exporter).
 
-To run the exporter on top of Kubernetes, grant following permissions to the pod:
-```yaml
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: events-exporter
-rules:
-- apiGroups: ["", "events.k8s.io"]
-  resources: ["events"]
-  verbs: ["get", "list", "watch"]
+```bash
+docker pull ghcr.io/nabokihms/events_exporter:latest
 ```
 
-Helm chart will be available in the future releases.
+### Helm Chart
+
+The first version of helm chart is available.
+1. Clone this repo.
+2. Install the chart:
+    ```bash
+    helm upgrade --install events-exporter ./charts/events_exporter
+    ```
+    __Note__: If you want to install the chart to the custom namespace, you need to create it first.
+
+
+3. After the installation, metrics will be available on address `http://events-exporter.default:9000/metrics`
+
+
+
+## Alerts and Dashboards
+
+TBA
