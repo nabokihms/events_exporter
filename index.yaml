@@ -1,0 +1,15 @@
+apiVersion: v1
+entries:
+  events-exporter:
+  - apiVersion: v2
+    created: "2022-02-28T05:09:47.233429908Z"
+    description: Prometheus exporter that collects Kubernetes cluster events and exposes
+      them as metric samples.
+    digest: 206ffef67a6f40efbffc13de45944869ec98b79928c9610de0ca9ed32923bfb5
+    kubeVersion: '>=1.10.0-0'
+    name: events-exporter
+    type: application
+    urls:
+    - https://github.com/nabokihms/events_exporter/releases/download/events-exporter-0.0.1/events-exporter-0.0.1.tgz
+    version: 0.0.1
+generated: "2022-02-28T05:09:47.233436308Z"
