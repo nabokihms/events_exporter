@@ -32,17 +32,8 @@ docker pull ghcr.io/nabokihms/events_exporter:latest
 ### Helm Chart
 
 The first version of helm chart is available.
-1. Clone this repo.
-2. Install the chart:
-    ```bash
-    helm upgrade --install events-exporter ./charts/events_exporter
-    ```
-    __Note__: If you want to install the chart to the custom namespace, you need to create it first.
-
-
-3. After the installation, metrics will be available on address `http://events-exporter.default:9000/metrics`
-
-
+1. Follow the instruction from [artifacthub](https://artifacthub.io/packages/helm/events-exporter/events-exporter) to install the chart
+2. After the installation, metrics will be available on address `http://events-exporter.default:9000/metrics`
 
 ## Alerts and Dashboards
 
