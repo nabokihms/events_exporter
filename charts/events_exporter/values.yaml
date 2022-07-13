@@ -17,6 +17,8 @@ cmdArgs:
   eventsSelector: "type!=Normal"
   # -- Omit events messages. It helps to reduce metrics cardinality.
   ommitMessages: false
+  # -- Log all events resources to stdout (helps with debugging kube api)
+  logEvents: true
 
 # -- Reference to one or more secrets to be used when [pulling images](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-pod-that-uses-your-secret) (from private registries).
 imagePullSecrets: []
