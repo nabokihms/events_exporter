@@ -14,7 +14,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -34,7 +33,6 @@ func main() {
 		kubeconfig         = ""
 		fieldSelector      = ""
 		omitEventsMessages = false
-		logEvents          = false
 	)
 
 	flag.StringVar(&exporterAddress, "server.exporter-address", exporterAddress, "Address to export prometheus metrics")
@@ -42,12 +40,10 @@ func main() {
 	flag.StringVar(&kubeconfig, "kube.config", kubeconfig, "Path to kubeconfig (optional)")
 	flag.StringVar(&fieldSelector, "kube.field-selector", fieldSelector, "Events filter as for kubectl")
 	flag.BoolVar(&omitEventsMessages, "kube.omit-events-messages", omitEventsMessages, "Do not expose message field from events (it reduces cardinality)")
-	flag.BoolVar(&logEvents, "kube.log-events", logEvents, "Log every incoming event to stdout in json format")
 
 	flag.Parse()
 
-	logFormat := fmt.Sprintf("logger:stdout?json=%t", logEvents)
-	if err := log.Base().SetFormat(logFormat); err != nil {
+	if err := log.Base().SetFormat("logger:stdout?json=true"); err != nil {
 		log.Fatalf("error formating logger: %v", err)
 	}
 
@@ -64,7 +60,7 @@ func main() {
 		log.Fatalf("mappings registration: %v", err)
 	}
 
-	informer, err := kube.NewEventsInformer(kubeconfig, fieldSelector, kube.EventCallback(metricsVault, omitEventsMessages, logEvents))
+	informer, err := kube.NewEventsInformer(kubeconfig, fieldSelector, kube.EventCallback(metricsVault, omitEventsMessages))
 	if err != nil {
 		log.Fatalf("kubernetes informer: %v", err)
 	}

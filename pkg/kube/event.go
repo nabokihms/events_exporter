@@ -14,7 +14,6 @@
 package kube
 
 import (
-	"encoding/json"
 	"time"
 
 	"github.com/prometheus/common/log"
@@ -33,19 +32,10 @@ func trimMessage(message string) string {
 }
 
 // EventToSample converts Kubernetes core v1.Event to the prometheus metric sample.
-func EventToSample(event *v1.Event, omitEventsMessages, logEvents bool) vault.Sample {
+func EventToSample(event *v1.Event, omitEventsMessages bool) vault.Sample {
 	var message string
 	if !omitEventsMessages {
 		message = trimMessage(event.Message)
-	}
-
-	if logEvents {
-		data, _ := json.Marshal(event)
-
-		var m map[string]interface{}
-		json.Unmarshal(data, &m)
-
-		log.Base().With("event", m).Info("received event")
 	}
 
 	return vault.Sample{
@@ -68,10 +58,11 @@ func EventToSample(event *v1.Event, omitEventsMessages, logEvents bool) vault.Sa
 }
 
 // EventCallback generates the handler to connect prometheus metrics vault to the shared events informer.
-func EventCallback(vault *vault.MetricsVault, omitEventsMessages, logEvents bool) func(obj interface{}) {
+func EventCallback(vault *vault.MetricsVault, omitEventsMessages bool) func(obj interface{}) {
 	return func(obj interface{}) {
+		log.With("event", obj).Debug("received event")
 		event := obj.(*v1.Event)
-		if err := vault.Store("kube_event_info", EventToSample(event, omitEventsMessages, logEvents)); err != nil {
+		if err := vault.Store("kube_event_info", EventToSample(event, omitEventsMessages)); err != nil {
 			log.Errorf("collecting event: %v", err)
 		}
 	}
