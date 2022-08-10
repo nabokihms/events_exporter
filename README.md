@@ -16,7 +16,7 @@ Usage of events_exporter:
   -server.exporter-address string
         Address to export prometheus metrics (default ":9000")
   -server.log-level string
-        Log level (default "info")
+        Log level (default "info"). When "debug" - logs all incoming events
 ```
 
 ## Install

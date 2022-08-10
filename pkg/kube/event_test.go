@@ -30,7 +30,6 @@ func TestEventToSample(t *testing.T) {
 		InputEvent   v1.Event
 		OutputSample vault.Sample
 		OmitMessage  bool
-		LogEvents    bool
 	}{
 		{
 			Name:       "Empty",
@@ -40,7 +39,6 @@ func TestEventToSample(t *testing.T) {
 				Labels:    []string{"", "", "", "", "", "", "", "", "", ""},
 				Timestamp: metav1.Time{}.Local(),
 			},
-			LogEvents: true,
 		},
 		{
 			Name: "Too long message",
@@ -63,7 +61,6 @@ func TestEventToSample(t *testing.T) {
 				Labels:    []string{"", "", "", "", "", "", "", "", "", ""},
 				Timestamp: metav1.Time{}.Local(),
 			},
-			LogEvents: true,
 		},
 		{
 			Name: "Omit message",
@@ -77,13 +74,12 @@ func TestEventToSample(t *testing.T) {
 				Timestamp: metav1.Time{}.Local(),
 			},
 			OmitMessage: true,
-			LogEvents:   true,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.Name, func(t *testing.T) {
-			sample := EventToSample(&tc.InputEvent, tc.OmitMessage, tc.LogEvents)
+			sample := EventToSample(&tc.InputEvent, tc.OmitMessage)
 			require.Equal(t, tc.OutputSample, sample)
 		})
 	}

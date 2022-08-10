@@ -1,6 +1,6 @@
 # events-exporter
 
-![Version: 0.0.1](https://img.shields.io/badge/Version-0.0.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
+![Version: 0.0.2](https://img.shields.io/badge/Version-0.0.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square)
 
 Prometheus exporter that collects Kubernetes cluster events and exposes them as metric samples.
 
@@ -16,9 +16,10 @@ Kubernetes: `>=1.10.0-0`
 | image.repository | string | `"ghcr.io/nabokihms/events_exporter"` | Name of the image repository to pull the container image from. |
 | image.pullPolicy | string | `"IfNotPresent"` | [Image pull policy](https://kubernetes.io/docs/concepts/containers/images/#updating-images) for updating already existing images on a node. |
 | image.tag | string | `"latest"` | Image tag override for the default value (chart appVersion). |
-| cmdArgs | object | `{"eventsSelector":"type!=Normal","ommitMessages":false}` | Command line argument options for exporter. |
+| cmdArgs | object | `{"eventsSelector":"type!=Normal","logLevel":"debug","ommitMessages":false}` | Command line argument options for exporter. |
 | cmdArgs.eventsSelector | string | `"type!=Normal"` | Filed selector for events to export. |
 | cmdArgs.ommitMessages | bool | `false` | Omit events messages. It helps to reduce metrics cardinality. |
+| cmdArgs.logLevel | string | `"debug"` | Log level (when set to debug - logs all events resources to stdout which helps with debugging Kubernetes API) |
 | imagePullSecrets | list | `[]` | Reference to one or more secrets to be used when [pulling images](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-pod-that-uses-your-secret) (from private registries). |
 | nameOverride | string | `""` | A name in place of the chart name for `app:` labels. |
 | fullnameOverride | string | `""` | A name to substitute for the full names of resources. |
