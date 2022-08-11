@@ -1,6 +1,6 @@
 apiVersion: v2
 type: application
 name: events-exporter
-version: 0.0.2
+version: 0.0.3
 kubeVersion: ">=1.10.0-0"
 description: "Prometheus exporter that collects Kubernetes cluster events and exposes them as metric samples."

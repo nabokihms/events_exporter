@@ -3,7 +3,7 @@ $( shell mkdir -p bin )
 
 GOOS?=$(shell go env GOOS)
 GOARCH?=$(shell go env GOARCH)
-GOLANGCI_VERSION = 1.40.1
+GOLANGCI_VERSION = 1.46.2
 HELM_DOCS_VERSION = 1.5.0
 
 ifeq ($(GOARCH),arm)
@@ -30,7 +30,7 @@ bin/golangci-lint: bin/golangci-lint-${GOLANGCI_VERSION}
 	@ln -sf golangci-lint-${GOLANGCI_VERSION} bin/golangci-lint
 
 bin/golangci-lint-${GOLANGCI_VERSION}:
-	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | BINARY=golangci-lint bash -s -- v${GOLANGCI_VERSION}
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | BINARY=golangci-lint bash -s -- v${GOLANGCI_VERSION}
 	@mv bin/golangci-lint $@
 
 bin/helm-docs: bin/helm-docs-${HELM_DOCS_VERSION}
