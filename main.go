@@ -43,6 +43,10 @@ func main() {
 
 	flag.Parse()
 
+	if err := log.Base().SetFormat("logger:stdout?json=true"); err != nil {
+		log.Fatalf("error formating logger: %v", err)
+	}
+
 	if err := log.Base().SetLevel(logLevel); err != nil {
 		log.Fatalf("set log level: %v", err)
 	}

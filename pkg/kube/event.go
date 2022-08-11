@@ -60,6 +60,7 @@ func EventToSample(event *v1.Event, omitEventsMessages bool) vault.Sample {
 // EventCallback generates the handler to connect prometheus metrics vault to the shared events informer.
 func EventCallback(vault *vault.MetricsVault, omitEventsMessages bool) func(obj interface{}) {
 	return func(obj interface{}) {
+		log.With("event", obj).Debug("received event")
 		event := obj.(*v1.Event)
 		if err := vault.Store("kube_event_info", EventToSample(event, omitEventsMessages)); err != nil {
 			log.Errorf("collecting event: %v", err)

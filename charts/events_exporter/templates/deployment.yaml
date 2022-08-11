@@ -63,6 +63,9 @@ spec:
         {{- if .Values.cmdArgs.ommitMessages }}
         - "-kube.omit-events-messages"
         {{- end }}
+        {{- with .Values.cmdArgs.logLevel }}
+        - "-server.log-level={{ . }}"
+        {{- end }}
         env:
           {{- range $key, $value := .Values.env }}
           - name: {{ $key }}
