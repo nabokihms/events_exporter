@@ -63,6 +63,9 @@ spec:
         {{- if .Values.cmdArgs.ommitMessages }}
         - "-kube.omit-events-messages"
         {{- end }}
+        {{- if .Values.cmdArgs.eventsTTL }}
+        - "-kube.events-ttl={{ . }}"
+        {{- end }}
         {{- with .Values.cmdArgs.logLevel }}
         - "-server.log-level={{ . }}"
         {{- end }}

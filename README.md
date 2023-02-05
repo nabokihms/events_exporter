@@ -6,9 +6,11 @@ Prometheus-exporter, which converts Kubernetes events to Prometheus samples.
 
 ## Usage
 ```
-Usage of events_exporter:
+Usage of bin/events_exporter:
   -kube.config string
         Path to kubeconfig (optional)
+  -kube.events-ttl duration
+        For how long to keep stale events (default 1h0m0s)
   -kube.field-selector string
         Events filter as for kubectl
   -kube.omit-events-messages
@@ -16,7 +18,7 @@ Usage of events_exporter:
   -server.exporter-address string
         Address to export prometheus metrics (default ":9000")
   -server.log-level string
-        Log level (default "info"). When "debug" - logs all incoming events
+        Log level (default "info")
 ```
 
 ## Install

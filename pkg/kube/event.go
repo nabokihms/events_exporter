@@ -57,10 +57,11 @@ func EventToSample(event *v1.Event, omitEventsMessages bool) vault.Sample {
 	}
 }
 
-// EventCallback generates the handler to connect prometheus metrics vault to the shared events informer.
+// EventCallback generates the handler to connect prometheus metrics vault to the shared event informer.
 func EventCallback(vault *vault.MetricsVault, omitEventsMessages bool) func(obj interface{}) {
 	return func(obj interface{}) {
 		log.With("event", obj).Debug("received event")
+
 		event := obj.(*v1.Event)
 		if err := vault.Store("kube_event_info", EventToSample(event, omitEventsMessages)); err != nil {
 			log.Errorf("collecting event: %v", err)
@@ -70,7 +71,7 @@ func EventCallback(vault *vault.MetricsVault, omitEventsMessages bool) func(obj 
 
 // EventMapping creates the mapping for the prometheus metrics vault. The order of the labels here should match the one
 // from the sample converter function.
-func EventMapping() vault.Mapping {
+func EventMapping(ttl time.Duration) vault.Mapping {
 	return vault.Mapping{
 		Name: "kube_event_info",
 		Help: "Expose Kubernetes events information",
@@ -86,6 +87,6 @@ func EventMapping() vault.Mapping {
 			"reason",
 			"message",
 		},
-		TTL: time.Hour,
+		TTL: ttl,
 	}
 }

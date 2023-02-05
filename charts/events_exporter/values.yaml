@@ -11,10 +11,11 @@ image:
   # -- Image tag override for the default value (chart appVersion).
   tag: "latest"
 
-# -- Command line argument options for exporter.
 cmdArgs:
   # -- Filed selector for events to export.
   eventsSelector: "type!=Normal"
+  # -- Time to keep stale events.
+  eventsTTL: 1h
   # -- Omit events messages. It helps to reduce metrics cardinality.
   ommitMessages: false
   # -- Log level (when set to debug - logs all events resources to stdout that helps with debugging Kubernetes API).
