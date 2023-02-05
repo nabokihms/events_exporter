@@ -63,6 +63,26 @@ func TestCollector(t *testing.T) {
 			},
 			Result: []string{"test-ok"},
 		},
+		{
+			Name: "Sample without timestamp",
+			Samples: []Sample{
+				{
+					ID:     "metric-1",
+					Labels: []string{"test-ok"},
+				},
+			},
+			Result: []string{"test-ok"},
+		},
+		{
+			Name: "The same sample",
+			Samples: []Sample{
+				{
+					ID:     "metric-1",
+					Labels: []string{"test-ok"},
+				},
+			},
+			Result: []string{"test-ok"},
+		},
 	}
 
 	for _, tc := range tests {
@@ -107,6 +127,107 @@ func TestCollector(t *testing.T) {
 
 			sort.Strings(names)
 			require.Equal(t, tc.Result, names)
+		})
+	}
+}
+
+func TestCollectorNoTimestamp(t *testing.T) {
+	curTime := time.Now()
+
+	tests := []struct {
+		Name    string
+		Samples []Sample
+		Result  time.Time
+	}{
+		{
+			Name: "Sample with timestamp must keep original timestamp",
+			Samples: []Sample{
+				{
+					ID:        "metric-1",
+					Labels:    []string{"test-ok"},
+					Timestamp: curTime.Add(3 * time.Hour),
+				},
+			},
+			Result: curTime.Add(3 * time.Hour),
+		},
+		{
+			Name: "Sample without timestamp must be timestamped",
+			Samples: []Sample{
+				{
+					ID:     "metric-2",
+					Labels: []string{"test-ok"},
+				},
+			},
+			Result: curTime,
+		},
+		{
+			Name: "Sample without timestamp updated must be have updated timestamp if value changed",
+			Samples: []Sample{
+				{
+					ID:     "metric-3",
+					Labels: []string{"test-ok"},
+					Value:  0,
+				},
+				{
+					ID:        "metric-3",
+					Labels:    []string{"test-ok"},
+					Value:     1,
+					Timestamp: curTime.Add(3 * time.Hour),
+				},
+			},
+			Result: curTime.Add(3 * time.Hour),
+		},
+		{
+			Name: "Sample without timestamp updated must have new timestamp",
+			Samples: []Sample{
+				{
+					ID:     "metric-4",
+					Labels: []string{"test-ok"},
+					Value:  1,
+				},
+				{
+					ID:        "metric-4",
+					Labels:    []string{"test-ok"},
+					Value:     1,
+					Timestamp: curTime.Add(3 * time.Hour),
+				},
+			},
+			Result: curTime.Add(3 * time.Hour),
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.Name, func(t *testing.T) {
+			// To be sure that we have clean registry all the time
+			prometheus.DefaultRegisterer = prometheus.NewRegistry()
+
+			vault := NewVault()
+			err := vault.RegisterMappings([]Mapping{
+				{
+					Name:       "test_metric",
+					Help:       "Test",
+					LabelNames: []string{"name"},
+					TTL:        time.Hour,
+				},
+			})
+			require.NoError(t, err)
+
+			vault.now = func() time.Time { return curTime } // mock clock
+
+			for _, s := range tc.Samples {
+				err = vault.Store("test_metric", s)
+				require.NoError(t, err)
+			}
+
+			collector := vault.metrics["test_metric"].(*GaugeCollector)
+
+			metric := StampedGaugeMetric{}
+			for _, m := range collector.collection {
+				metric = m
+				break
+			}
+
+			require.Equal(t, metric.LastUpdate, tc.Result)
 		})
 	}
 }

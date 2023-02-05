@@ -22,24 +22,28 @@ import (
 )
 
 func init() {
-	klog.SetLogger(&logger{})
+	klog.SetLogger(logr.New(&sink{}))
 }
 
 // logger is an implementation of logr.Logger interface.
 // It allows us to override standard klog output with desired logger (from prometheus).
-var _ logr.Logger = (*logger)(nil)
+var _ logr.LogSink = (*sink)(nil)
 
-type logger struct{}
+type sink struct{}
 
-func (l *logger) Enabled() bool {
+func (l *sink) Enabled(_ int) bool {
 	return true
 }
 
-func (l *logger) Info(msg string, keysAndValues ...interface{}) {
+func (l *sink) Init(_ logr.RuntimeInfo) {
+	return
+}
+
+func (l *sink) Info(_ int, msg string, keysAndValues ...interface{}) {
 	log.Infof(msg, keysAndValues...)
 }
 
-func (l *logger) Error(err error, msg string, keysAndValues ...interface{}) {
+func (l *sink) Error(err error, msg string, keysAndValues ...interface{}) {
 	message := fmt.Sprintf(msg, keysAndValues...)
 	if err != nil {
 		message = fmt.Sprintf("%s: %v", message, err)
@@ -47,14 +51,14 @@ func (l *logger) Error(err error, msg string, keysAndValues ...interface{}) {
 	log.Error(message)
 }
 
-func (l *logger) V(_ int) logr.Logger {
+func (l *sink) V(_ int) logr.LogSink {
 	return l
 }
 
-func (l *logger) WithValues(_ ...interface{}) logr.Logger {
+func (l *sink) WithValues(_ ...interface{}) logr.LogSink {
 	return l
 }
 
-func (l *logger) WithName(_ string) logr.Logger {
+func (l *sink) WithName(_ string) logr.LogSink {
 	return l
 }

@@ -3,8 +3,8 @@ $( shell mkdir -p bin )
 
 GOOS?=$(shell go env GOOS)
 GOARCH?=$(shell go env GOARCH)
-GOLANGCI_VERSION = 1.46.2
-HELM_DOCS_VERSION = 1.5.0
+GOLANGCI_VERSION = 1.51.0
+HELM_DOCS_VERSION = 1.11.0
 
 ifeq ($(GOARCH),arm)
 	ARCH=armv7
@@ -17,7 +17,6 @@ COMMIT=$(shell git rev-parse --verify HEAD)
 ###########
 # BUILDING
 ###########
-.PHONY: build
 bin/events_exporter:
 	GOOS=$(GOOS) GOARCH=$(GOARCH) CGO_ENABLED=0 go build -mod=readonly -o bin/events_exporter
 
@@ -54,4 +53,4 @@ docs: bin/helm-docs
 # TESTING
 ###########
 test:
-	go test -race -cover ./...
+	go test -race -cover -v ./...

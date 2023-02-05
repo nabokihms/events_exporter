@@ -81,19 +81,23 @@ func (c *GaugeCollector) Store(timestamp time.Time, sample Sample) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	gaugeValue := sample.Value
 	storedMetric, ok := c.collection[labelsHash]
 	if !ok {
-		storedMetric = StampedGaugeMetric{Value: gaugeValue, LabelValues: sample.Labels}
+		storedMetric = StampedGaugeMetric{LabelValues: sample.Labels, LastUpdate: timestamp}
 	}
 
-	storedMetric.Value = gaugeValue
-
-	storedMetric.LastUpdate = timestamp
+	// If sample contains last update information, that means it was collected from the metric source.
+	// Consider this as a truth.
 	if !sample.Timestamp.IsZero() {
 		storedMetric.LastUpdate = sample.Timestamp
+		// If a value has not been changed, this is a fake update.
+		// The same event cannot be truly updated without changing its value.
+		// For this kind of events timestamp should not be updated by exporter.
+	} else if sample.Value != storedMetric.Value {
+		storedMetric.LastUpdate = timestamp
 	}
 
+	storedMetric.Value = sample.Value
 	c.collection[labelsHash] = storedMetric
 }
 

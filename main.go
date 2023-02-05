@@ -33,13 +33,15 @@ func main() {
 		kubeconfig         = ""
 		fieldSelector      = ""
 		omitEventsMessages = false
+		eventsTTL          = time.Hour
 	)
 
 	flag.StringVar(&exporterAddress, "server.exporter-address", exporterAddress, "Address to export prometheus metrics")
-	flag.StringVar(&logLevel, "server.log-level", logLevel, "Log level")
+	flag.StringVar(&logLevel, "server.log-level", logLevel, "Log level (logs all incoming events if debug)")
 	flag.StringVar(&kubeconfig, "kube.config", kubeconfig, "Path to kubeconfig (optional)")
 	flag.StringVar(&fieldSelector, "kube.field-selector", fieldSelector, "Events filter as for kubectl")
 	flag.BoolVar(&omitEventsMessages, "kube.omit-events-messages", omitEventsMessages, "Do not expose message field from events (it reduces cardinality)")
+	flag.DurationVar(&eventsTTL, "kube.events-ttl", eventsTTL, "For how long to keep stale events")
 
 	flag.Parse()
 
@@ -55,7 +57,7 @@ func main() {
 	stopCh := make(chan struct{})
 
 	metricsVault := vault.NewVault()
-	err := metricsVault.RegisterMappings([]vault.Mapping{kube.EventMapping()})
+	err := metricsVault.RegisterMappings([]vault.Mapping{kube.EventMapping(eventsTTL)})
 	if err != nil {
 		log.Fatalf("mappings registration: %v", err)
 	}
@@ -65,7 +67,7 @@ func main() {
 		log.Fatalf("kubernetes informer: %v", err)
 	}
 
-	// TODO(nabokihms): Be sure that after starting informer we clear all stale events before starting web server
+	// TODO(nabokihms): Ensure that after starting informer we clear all stale events before starting web server
 	go func() {
 		informer.Run(stopCh, errorCh)
 		metricsVault.RemoveStaleMetrics()
